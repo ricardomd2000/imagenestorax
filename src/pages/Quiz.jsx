@@ -6,7 +6,7 @@ import { Trophy, ChevronRight, HelpCircle } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
 const Quiz = () => {
-  const { user } = useAuth()
+  const { user, studentSession, isTeacher } = useAuth()
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -49,22 +49,27 @@ const Quiz = () => {
       if (answers[idx] === q.respuesta_correcta) score++
     })
 
-    const { error } = await supabase
-      .from('seguimiento')
-      .update({ 
-        puntaje_quiz: score,
-        fase_actual: 2 
-      })
-      .eq('estudiante_id', user.id)
+    // Update session if it's a student or teacher testing
+    const targetId = studentSession?.id || (isTeacher ? null : null)
+    
+    if (targetId) {
+      const { error } = await supabase
+        .from('seguimiento')
+        .update({ 
+          puntaje_quiz: score,
+          fase_actual: 2 
+        })
+        .eq('id', targetId)
 
-    if (!error) {
-      setIsFinished(true)
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 }
-      })
+      if (error) console.error("Error updating progress:", error)
     }
+
+    setIsFinished(true)
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    })
   }
 
   if (loading) return null

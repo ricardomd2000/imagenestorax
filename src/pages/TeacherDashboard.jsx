@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { Activity, Users, User, Search, Filter, MessageSquare, ClipboardCheck, ExternalLink } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { Activity, Users, User, Search, Filter, MessageSquare, ClipboardCheck, ExternalLink, ShieldAlert } from 'lucide-react'
 
 const TeacherDashboard = () => {
+  const { isTeacher, loading: authLoading } = useAuth()
   const [students, setStudents] = useState([])
   const [filter, setFilter] = useState('')
   const [selectedGroup, setSelectedGroup] = useState('Todos')
@@ -10,9 +12,10 @@ const TeacherDashboard = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (authLoading || !isTeacher) return
+
     fetchStudents()
 
-    // Subscribe to real-time changes
     const channel = supabase
       .channel('seguimiento-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'seguimiento' }, () => {
@@ -23,7 +26,7 @@ const TeacherDashboard = () => {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [])
+  }, [authLoading, isTeacher])
 
   const fetchStudents = async () => {
     const { data } = await supabase
@@ -35,6 +38,18 @@ const TeacherDashboard = () => {
     setLoading(false)
   }
 
+  if (authLoading) return <div className="p-20 text-center">Cargando dashboard...</div>
+  
+  if (!isTeacher) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+        <ShieldAlert size={64} className="text-error mb-4" />
+        <h2 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h2>
+        <p className="text-text-secondary">Este panel está reservado para el personal docente autorizado.</p>
+      </div>
+    )
+  }
+
   const groups = ['Todos', ...new Set(students.map(s => s.grupo).filter(Boolean))]
 
   const filteredStudents = students.filter(s => {
@@ -44,9 +59,9 @@ const TeacherDashboard = () => {
   })
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
+    <div className="max-w-7xl mx-auto py-8 px-4 animate-fade-in">
       <header className="flex justify-between items-center mb-10">
-        <div className="animate-fade-in">
+        <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Activity className="text-accent-primary" size={32} />
             Panel de Seguimiento <span className="text-accent-primary">Docente</span>
@@ -100,7 +115,7 @@ const TeacherDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredStudents.map((s) => (
+                {filteredStudents.length > 0 ? filteredStudents.map((s) => (
                   <tr key={s.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -132,7 +147,11 @@ const TeacherDashboard = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-text-secondary italic">No se encontraron estudiantes para los filtros seleccionados.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -5,40 +5,46 @@ import { useAuth } from '../context/AuthContext'
 import { Play, CheckCircle, Clock, BookOpen, Layers, ClipboardList } from 'lucide-react'
 
 const Dashboard = () => {
-  const { user, profile } = useAuth()
+  const { user, studentSession, isTeacher, loading: authLoading } = useAuth()
   const [tracking, setTracking] = useState(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (user) fetchTracking()
-  }, [user])
-
-  const fetchTracking = async () => {
-    const { data, error } = await supabase
-      .from('seguimiento')
-      .select('*')
-      .eq('estudiante_id', user.id)
-      .single()
+    if (authLoading) return
     
-    if (error && error.code === 'PGRST116') {
-      // Create initial tracking if not exists
-      const { data: newData } = await supabase
-        .from('seguimiento')
-        .insert([{ 
-          estudiante_id: user.id, 
-          nombre_estudiante: profile?.nombre_completo,
-          grupo: profile?.grupo,
-          fase_actual: 1 
-        }])
-        .select()
-        .single()
-      setTracking(newData)
+    // For students, use studentSession. For teachers, they can view but won't have tracking unless they "test"
+    if (studentSession) {
+      setTracking(studentSession)
+      setLoading(false)
+    } else if (isTeacher) {
+      setLoading(false)
     } else {
-      setTracking(data)
+      // If no session and not teacher, redirect to login
+      navigate('/login')
     }
-    setLoading(false)
-  }
+  }, [studentSession, authLoading, isTeacher])
+
+  // Real-time listener for current student session
+  useEffect(() => {
+    if (!studentSession?.id) return
+
+    const channel = supabase
+      .channel(`session-${studentSession.id}`)
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'seguimiento',
+        filter: `id=eq.${studentSession.id}`
+      }, (payload) => {
+        setTracking(payload.new)
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [studentSession?.id])
 
   const phases = [
     { 
@@ -64,16 +70,19 @@ const Dashboard = () => {
     }
   ]
 
-  if (loading) return null
+  if (authLoading || loading) return <div className="p-20 text-center">Cargando dashboard...</div>
+
+  const displayName = studentSession?.nombre_estudiante || (isTeacher ? 'Docente' : 'Estudiante')
+  const displayGroup = studentSession?.grupo || (isTeacher ? 'Administración' : 'N/A')
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       <div className="flex justify-between items-center mb-10">
         <div className="animate-fade-in">
-          <h1 className="text-3xl font-bold mb-2">Bienvenido, <span className="text-accent-primary">{profile?.nombre_completo || 'Estudiante'}</span></h1>
-          <p className="text-text-secondary">Grupo: {profile?.grupo || 'N/A'}</p>
+          <h1 className="text-3xl font-bold mb-2">Bienvenido, <span className="text-accent-primary">{displayName}</span></h1>
+          <p className="text-text-secondary">Grupo: {displayGroup}</p>
         </div>
-        {profile?.rol === 'docente' && (
+        {isTeacher && (
           <Link to="/teacher" className="btn-outline flex items-center gap-2">
             <Activity size={18} /> Dashboard Docente
           </Link>

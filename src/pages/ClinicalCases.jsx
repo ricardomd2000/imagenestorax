@@ -6,7 +6,7 @@ import { BookOpen, MapPin, Stethoscope, ChevronLeft, ChevronRight, Save } from '
 import confetti from 'canvas-confetti'
 
 const ClinicalCases = () => {
-  const { user } = useAuth()
+  const { user, studentSession, isTeacher } = useAuth()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [responses, setResponses] = useState({})
   const [loading, setLoading] = useState(false)
@@ -31,14 +31,18 @@ const ClinicalCases = () => {
   }
 
   const handleSaveProgress = async () => {
+    const targetId = studentSession?.id
+
+    if (!targetId) return
+
     setLoading(true)
     const { error } = await supabase
       .from('seguimiento')
       .update({ 
         respuestas_fase3: responses,
-        ultima_actualizacion: new Array().toISOString // Placeholder for now or just let default now() work
+        ultima_actualizacion: new Date().toISOString()
       })
-      .eq('estudiante_id', user.id)
+      .eq('id', targetId)
     
     setLoading(false)
     if (!error) {
@@ -48,24 +52,30 @@ const ClinicalCases = () => {
   }
 
   const finishPractice = async () => {
-    setLoading(true)
-    const { error } = await supabase
-      .from('seguimiento')
-      .update({ 
-        respuestas_fase3: responses,
-        completado: true,
-        fase_actual: 3 // Stay on 3 but mark as completed
-      })
-      .eq('estudiante_id', user.id)
+    const targetId = studentSession?.id
 
-    if (!error) {
-      confetti({
-        particleCount: 200,
-        spread: 90,
-        origin: { y: 0.6 }
-      })
-      navigate('/dashboard')
+    setLoading(true)
+    
+    if (targetId) {
+      const { error } = await supabase
+        .from('seguimiento')
+        .update({ 
+          respuestas_fase3: responses,
+          completado: true,
+          fase_actual: 3,
+          ultima_actualizacion: new Date().toISOString()
+        })
+        .eq('id', targetId)
+
+      if (error) console.error("Error finalizing practice:", error)
     }
+
+    confetti({
+      particleCount: 200,
+      spread: 90,
+      origin: { y: 0.6 }
+    })
+    navigate('/dashboard')
     setLoading(false)
   }
 

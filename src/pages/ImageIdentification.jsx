@@ -6,7 +6,7 @@ import { Image, ChevronRight, CheckCircle2 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
 const ImageIdentification = () => {
-  const { user } = useAuth()
+  const { user, studentSession, isTeacher } = useAuth()
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -79,24 +79,28 @@ const ImageIdentification = () => {
       if (answers[idx] === q.label) score++
     })
 
-    const { error } = await supabase
-      .from('seguimiento')
-      .update({ 
-        score_fase2: score,
-        respuestas_fase2: answers,
-        fase_actual: 3 
-      })
-      .eq('estudiante_id', user.id)
+    const targetId = studentSession?.id || (isTeacher ? null : null)
 
-    if (!error) {
-      setIsFinished(true)
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#38bdf8', '#f472b6', '#ffffff']
-      })
+    if (targetId) {
+      const { error } = await supabase
+        .from('seguimiento')
+        .update({ 
+          score_fase2: score,
+          respuestas_fase2: answers,
+          fase_actual: 3 
+        })
+        .eq('id', targetId)
+
+      if (error) console.error("Error updating progress:", error)
     }
+
+    setIsFinished(true)
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#38bdf8', '#f472b6', '#ffffff']
+    })
   }
 
   if (loading) return null
