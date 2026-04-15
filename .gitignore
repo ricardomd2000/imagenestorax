@@ -2,7 +2,8 @@
 node_modules/
 
 # Environment variables
-.env
+# .env is now included per user request for easy deployment
+# .env.local
 .env.local
 .env.development.local
 .env.test.local
