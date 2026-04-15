@@ -1,26 +1,49 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { Activity, Mail, Lock, Users, GraduationCap, ShieldCheck } from 'lucide-react'
+import { Activity, ShieldCheck, GraduationCap, ChevronRight, AlertCircle, Sparkles, User } from 'lucide-react'
 
 const Login = () => {
-  const { loginAsStudent } = useAuth()
-  const [isAdminMode, setIsAdminMode] = useState(false)
+  const [isTeacherMode, setIsTeacherMode] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [group, setGroup] = useState('')
+  const [studentGroup, setStudentGroup] = useState('')
+  const [studentName, setStudentName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const { loginAsStudent, loginTeacher } = useAuth()
+  const navigate = useNavigate()
 
   const handleStudentLogin = async (e) => {
     e.preventDefault()
-    if (!group) return
+    if (!studentGroup) {
+      setError('Por favor ingresa tu grupo.')
+      return
+    }
+    
     setLoading(true)
     setError(null)
     try {
-      await loginAsStudent(group)
+      const nameToUse = studentName || `Estudiante-${Math.random().toString(36).substring(7)}`
+      await loginAsStudent(studentGroup, nameToUse)
+      navigate('/dashboard')
     } catch (err) {
-      setError('Error al ingresar: ' + err.message)
+      console.error("Error en login estudiante:", err)
+      setError('Error al iniciar sesión. Intente de nuevo.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleQuickPrueba = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      await loginAsStudent('Prueba', 'Invitado-Prueba')
+      navigate('/dashboard')
+    } catch (err) {
+      setError('Error al iniciar modo prueba.')
     } finally {
       setLoading(false)
     }
@@ -36,98 +59,136 @@ const Login = () => {
         password,
       })
       if (loginError) throw loginError
+      navigate('/teacher')
     } catch (err) {
-      setError('Credenciales inválidas: ' + err.message)
+      setError('Credenciales de docente inválidas.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-[#0c0f16] to-[#1a2130]">
-      <div className="glass-panel w-full max-w-md p-8 animate-fade-in border border-white/10 shadow-2xl">
-        <div className="flex items-center justify-center mb-8">
-          <div className="bg-accent-primary/20 p-3 rounded-2xl mr-3">
-            <Activity className="text-accent-primary" size={32} />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#0a0c10]">
+      <div className="max-w-md w-full animate-fade-in">
+        {/* Logo Section */}
+        <div className="text-center mb-8">
+          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-accent-primary to-blue-600 mb-4 shadow-lg shadow-accent-primary/20">
+            <Activity className="text-white" size={40} />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Médica<span className="text-accent-primary">Base</span></h1>
+          <h1 className="text-4xl font-extrabold text-white tracking-tight mb-2">
+            Médica<span className="text-accent-primary">Base</span>
+          </h1>
+          <p className="text-text-secondary font-medium italic">Radiología de Tórax / Mediastino</p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex bg-white/5 p-1 rounded-xl mb-8">
+        {/* Mode Toggler */}
+        <div className="flex bg-slate-900/80 p-1 rounded-xl mb-8 border border-white/5 backdrop-blur-md">
           <button 
-            onClick={() => { setIsAdminMode(false); setError(null); }}
-            className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center transition-all ${!isAdminMode ? 'bg-accent-primary text-white shadow-lg' : 'text-text-secondary hover:text-white'}`}
+            onClick={() => { setIsTeacherMode(false); setError(null); }}
+            className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all ${!isTeacherMode ? 'bg-accent-primary text-slate-900 font-bold shadow-lg' : 'text-text-secondary hover:bg-white/5'}`}
           >
-            <GraduationCap size={18} className="mr-2" /> Estudiante
+            <GraduationCap size={18} /> Estudiante
           </button>
           <button 
-            onClick={() => { setIsAdminMode(true); setError(null); }}
-            className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center transition-all ${isAdminMode ? 'bg-accent-primary text-white shadow-lg' : 'text-text-secondary hover:text-white'}`}
+            onClick={() => { setIsTeacherMode(true); setError(null); }}
+            className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all ${isTeacherMode ? 'bg-slate-700 text-white font-bold' : 'text-text-secondary hover:bg-white/5'}`}
           >
-            <ShieldCheck size={18} className="mr-2" /> Docente
+            <ShieldCheck size={18} /> Docente
           </button>
         </div>
 
-        {isAdminMode ? (
-          <form onSubmit={handleTeacherLogin} className="space-y-4 animate-scale-in">
-            <p className="text-center text-text-secondary mb-6 text-sm">
-              Acceso restringido para el personal docente
-            </p>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 text-text-secondary" size={18} />
-              <input
-                className="pl-10 transition-all focus:border-accent-primary"
-                type="email"
-                placeholder="Email institucional"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+        <div className="glass-panel p-8 shadow-2xl relative overflow-hidden border-white/10">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-accent-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+          
+          {error && (
+            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3 text-error text-sm animate-shake">
+              <AlertCircle size={20} className="shrink-0" />
+              <span>{error}</span>
             </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 text-text-secondary" size={18} />
-              <input
-                className="pl-10 transition-all focus:border-accent-primary"
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <button disabled={loading} className="btn-primary w-full py-3 text-lg font-semibold mt-6 shadow-accent-primary/20 shadow-lg">
-              {loading ? 'Verificando...' : 'Entrar como Docente'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleStudentLogin} className="space-y-6 animate-scale-in">
-            <p className="text-center text-text-secondary mb-6 text-sm">
-              Ingresa tu grupo para comenzar la evaluación
-            </p>
-            <div className="relative">
-              <Users className="absolute left-3 top-4 text-accent-primary" size={20} />
-              <input
-                className="pl-12 py-4 text-xl font-bold tracking-widest text-center uppercase focus:border-accent-primary bg-white/5 transition-all"
-                type="text"
-                placeholder="EJ: B2"
-                value={group}
-                onChange={(e) => setGroup(e.target.value)}
-                required
-              />
-            </div>
-            <button disabled={loading} className="btn-primary w-full py-4 text-xl font-bold mt-4 shadow-accent-primary/20 shadow-xl border-t border-white/20">
-              {loading ? 'Ingresando...' : 'EMPEZAR PRÁCTICA'}
-            </button>
-          </form>
-        )}
+          )}
 
-        {error && <p className="text-error text-sm text-center mt-4 bg-error/10 p-3 rounded-lg border border-error/20">{error}</p>}
+          {!isTeacherMode ? (
+            <form onSubmit={handleStudentLogin} className="space-y-6">
+              <div className="space-y-4">
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
+                  <input 
+                    type="text" 
+                    placeholder="Tu Nombre (Opcional)"
+                    className="w-full bg-slate-950/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none transition-all"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                  />
+                </div>
+                <div className="relative">
+                  <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-accent-primary" size={20} />
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="Grupo (Ej: A1, B2...)"
+                    className="w-full bg-slate-950/50 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white text-lg font-bold uppercase focus:border-accent-primary focus:ring-1 focus:ring-accent-primary outline-none transition-all placeholder:font-normal placeholder:text-sm"
+                    value={studentGroup}
+                    onChange={(e) => setStudentGroup(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-2 group"
+                >
+                  {loading ? 'Iniciando...' : 'EMPEZAR EVALUACIÓN'}
+                  {!loading && <ChevronRight className="group-hover:translate-x-1 transition-transform" size={20} />}
+                </button>
+                
+                <button 
+                  type="button"
+                  onClick={handleQuickPrueba}
+                  className="w-full py-3 text-sm text-accent-primary hover:text-white transition-colors flex items-center justify-center gap-2 border border-accent-primary/20 rounded-xl hover:bg-accent-primary/10"
+                >
+                  <Sparkles size={16} /> Entrar en modo de prueba rápido
+                </button>
+              </div>
+
+              <p className="text-center text-xs text-text-secondary mt-6">
+                Acceso por grupo. Los resultados se guardarán automáticamente.
+              </p>
+            </form>
+          ) : (
+            <form onSubmit={handleTeacherLogin} className="space-y-6">
+              <div className="space-y-4">
+                <input 
+                  type="email" 
+                  required
+                  className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-white/30 outline-none transition-all"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Correo institucional"
+                />
+                <input 
+                  type="password" 
+                  required
+                  className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-white/30 outline-none transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Contraseña"
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                className="w-full bg-white text-slate-900 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+                disabled={loading}
+              >
+                {loading ? 'Accediendo...' : 'Ingresar al Panel'}
+                {!loading && <ShieldCheck size={20} />}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
-      
-      <p className="mt-8 text-text-secondary text-sm">
-        Sistema de Evaluación de Tórax © 2026
-      </p>
     </div>
   )
 }

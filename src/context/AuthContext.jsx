@@ -47,9 +47,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
   }
 
-  const loginAsStudent = async (grupo) => {
+  const loginAsStudent = async (grupo, nombre = null) => {
     // Create a new entry in seguimiento for this student
-    const tempName = `Estudiante-${Math.random().toString(36).substring(7)}`
+    const tempName = nombre || `Estudiante-${Math.random().toString(36).substring(7)}`
     
     const { data, error } = await supabase
       .from('seguimiento')
@@ -63,7 +63,10 @@ export const AuthProvider = ({ children }) => {
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error("Supabase insert error:", error)
+      throw error
+    }
 
     const session = { 
       id: data.id, 
