@@ -7,6 +7,7 @@ import Quiz from './pages/Quiz'
 import ImageIdentification from './pages/ImageIdentification'
 import ClinicalCases from './pages/ClinicalCases'
 import TeacherDashboard from './pages/TeacherDashboard'
+import GradingViaAerea from './pages/GradingViaAerea'
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, studentSession, isTeacher, role: userRole, loading } = useAuth()
@@ -66,6 +67,13 @@ const AppRoutes = () => {
             <TeacherDashboard />
           </ProtectedRoute>
         } />
+
+        <Route path="/grading-via-aerea" element={
+          <ProtectedRoute role="docente">
+            <GradingViaAerea />
+          </ProtectedRoute>
+        } />
+
 
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>

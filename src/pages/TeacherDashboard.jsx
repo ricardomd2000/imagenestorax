@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Activity, Users, User, Search, Filter, MessageSquare, ClipboardCheck, ExternalLink, ShieldAlert } from 'lucide-react'
 
@@ -69,11 +70,17 @@ const TeacherDashboard = () => {
           <p className="text-text-secondary mt-1">Monitorea el progreso de tus estudiantes en tiempo real.</p>
         </div>
         
-        <div className="flex bg-slate-800 rounded-lg p-1 border border-white/5">
-          <div className="flex items-center px-4 py-2 bg-accent-primary/10 text-accent-primary rounded-md">
-            <Users size={18} className="mr-2" />
-            <span className="font-bold text-lg">{students.length}</span>
-            <span className="ml-1 text-sm">Alumnos</span>
+        <div className="flex gap-4 items-center">
+          <Link to="/grading-via-aerea" className="btn-primary py-2 px-4 rounded-lg flex items-center gap-2">
+            <ClipboardCheck size={18} />
+            Calificar Vía Aérea
+          </Link>
+          <div className="flex bg-slate-800 rounded-lg p-1 border border-white/5">
+            <div className="flex items-center px-4 py-2 bg-accent-primary/10 text-accent-primary rounded-md">
+              <Users size={18} className="mr-2" />
+              <span className="font-bold text-lg">{students.length}</span>
+              <span className="ml-1 text-sm">Alumnos</span>
+            </div>
           </div>
         </div>
       </header>

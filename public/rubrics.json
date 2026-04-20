@@ -1,0 +1,98 @@
+{
+  "GRUPO 1 ": [
+    {
+      "Criterio de Evaluación": "Identificación de Cornetes",
+      "Completo (1 pto.)": "Identifica correctamente los tres cornetes (superior, medio e inferior).",
+      "Faltan elementos (0.5 ptos.)": "Identifica solo uno o dos cornetes, o presenta errores en su ubicación.",
+      "Incompleto (0 ptos.)": "No identifica los cornetes o la información es errónea."
+    },
+    {
+      "Criterio de Evaluación": "Identificación de Meatos",
+      "Completo (1 pto.)": "Localiza con precisión los tres meatos bajo sus respectivos cornetes.",
+      "Faltan elementos (0.5 ptos.)": "Identifica solo algunos meatos o confunde su posición anatómica.",
+      "Incompleto (0 ptos.)": "No identifica los meatos."
+    },
+    {
+      "Criterio de Evaluación": "Drenaje de los Meatos",
+      "Completo (1 pto.)": "Describe correctamente todos los drenajes (nasolagrimal, senos y celdillas).",
+      "Faltan elementos (0.5 ptos.)": "Menciona algunos drenajes, pero omite otros importantes (ej. olvida el maxilar).",
+      "Incompleto (0 ptos.)": "No describe los puntos de drenaje o la información es incorrecta."
+    },
+    {
+      "Criterio de Evaluación": "Conformación Ósea",
+      "Completo (1 pto.)": "Identifica todos los huesos que forman la pared lateral (Etmoides, Maxilar, Palatino, etc.).",
+      "Faltan elementos (0.5 ptos.)": "Menciona los huesos de forma incompleta o confunde los huesos propios con los de la pared.",
+      "Incompleto (0 ptos.)": "No identifica los componentes óseos de la cara lateral."
+    },
+    {
+      "Criterio de Evaluación": "Subida de Imagen",
+      "Completo (1 pto.)": "La imagen es clara, está correctamente etiquetada y en formato de imagen (JPG/PNG).",
+      "Faltan elementos (0.5 ptos.)": "Se incluye la imagen pero no es clara, carece de etiquetas o el formato no es el ideal.",
+      "Incompleto (0 ptos.)": "No se adjunta imagen o el formato no permite su visualización (ej. enlace roto)."
+    }
+  ],
+  "GRUPO 2": [
+    {
+      "Criterio de Evaluación": "Identificación de Senos (Grupo Anterior)",
+      "Completo (1 pto.)": "Identifica y ubica correctamente los senos Frontales y Maxilares.",
+      "Faltan elementos (0.5 ptos.)": "Identifica solo uno de los dos senos o su ubicación es imprecisa.",
+      "Incompleto (0 ptos.)": "No identifica los senos frontales ni maxilares."
+    },
+    {
+      "Criterio de Evaluación": "Identificación de Senos (Grupo Posterior)",
+      "Completo (1 pto.)": "Identifica y ubica correctamente las celdillas Etmoidales (anteriores y posteriores) y el seno Esfenoidal.",
+      "Faltan elementos (0.5 ptos.)": "Omite las celdillas etmoidales o el seno esfenoidal en la identificación.",
+      "Incompleto (0 ptos.)": "No identifica los componentes del grupo posterior."
+    },
+    {
+      "Criterio de Evaluación": "Drenaje del Grupo Anterior",
+      "Completo (1 pto.)": "Explica correctamente que el seno frontal, maxilar y etmoidal anterior drenan en el meato medio.",
+      "Faltan elementos (0.5 ptos.)": "Menciona el drenaje pero confunde el meato o solo asocia un seno correctamente.",
+      "Incompleto (0 ptos.)": "No describe los puntos de drenaje del grupo anterior."
+    },
+    {
+      "Criterio de Evaluación": "Drenaje del Grupo Posterior",
+      "Completo (1 pto.)": "Indica correctamente el drenaje de las celdillas posteriores en el meato superior y del seno esfenoidal en el receso esfenoetmoidal.",
+      "Faltan elementos (0.5 ptos.)": "Identifica solo uno de los dos puntos de drenaje o confunde los nombres técnicos.",
+      "Incompleto (0 ptos.)": "No describe los puntos de drenaje del grupo posterior."
+    },
+    {
+      "Criterio de Evaluación": "Formato de Imagen",
+      "Completo (1 pto.)": "La actividad incluye una imagen clara, etiquetada y subida en un formato de imagen válido (JPG, PNG).",
+      "Faltan elementos (0.5 ptos.)": "La imagen está presente pero es de baja calidad, no tiene etiquetas o el formato es difícil de abrir.",
+      "Incompleto (0 ptos.)": "No se subió la imagen o el archivo no corresponde a un formato de imagen."
+    }
+  ],
+  "GRUPO 3 ": [
+    {
+      "Criterio de Evaluación": "Identificación de Músculos",
+      "Completo (1 pto.)": "Identifica todos los músculos clave: Cricotiroideo, Cricoaritenoideos (post/lat), Tiroaritenoideo y Aritenoideos.",
+      "Faltan elementos (0.5 ptos.)": "Identifica la mayoría, pero omite alguno o confunde los nombres.",
+      "Incompleto (0 ptos.)": "No identifica los músculos o señala erróneamente músculos extrínsecos."
+    },
+    {
+      "Criterio de Evaluación": "Función y Acción",
+      "Completo (1 pto.)": "Describe correctamente la acción de cada músculo (abducción, aducción o tensión de la glotis).",
+      "Faltan elementos (0.5 ptos.)": "Describe funciones de forma parcial o presenta errores leves en la mecánica vocal.",
+      "Incompleto (0 ptos.)": "No describe las funciones o la información es incorrecta."
+    },
+    {
+      "Criterio de Evaluación": "Inervación",
+      "Completo (1 pto.)": "Especifica correctamente el origen nervioso (Laríngeo Recurrente y la excepción del Laríngeo Superior).",
+      "Faltan elementos (0.5 ptos.)": "Menciona la inervación de forma general sin distinguir las ramas específicas.",
+      "Incompleto (0 ptos.)": "No menciona la inervación o confunde los pares craneales."
+    },
+    {
+      "Criterio de Evaluación": "Comprensión de Inserciones",
+      "Completo (1 pto.)": "En el dibujo se aprecia claramente que comprende los puntos de origen e inserción en los cartílagos (Cricoides, Tiroides, Aritenoides).",
+      "Faltan elementos (0.5 ptos.)": "Las inserciones en el dibujo son aproximadas o faltan puntos de anclaje clave en algunos músculos.",
+      "Incompleto (0 ptos.)": "Las inserciones dibujadas son anatómicamente incorrectas o no se muestran."
+    },
+    {
+      "Criterio de Evaluación": "Formato de Imagen",
+      "Completo (1 pto.)": "La actividad incluye una imagen clara, etiquetada y subida en un formato de imagen válido (JPG, PNG).",
+      "Faltan elementos (0.5 ptos.)": "La imagen está presente pero es de baja calidad o el formato no es el solicitado.",
+      "Incompleto (0 ptos.)": "No se adjunta imagen o el archivo no corresponde a un formato de imagen."
+    }
+  ]
+}
